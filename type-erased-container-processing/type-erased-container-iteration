@@ -1,0 +1,88 @@
+Disclosed is a method of processing the elements of a container in C++ code
+without compile-time knowledge of the type of the container or of the element
+type within the container.
+
+The C++ type system provides readability, safety of data interpretation and
+can be used for compatibility between different code from different vendors.
+The type of all code components is determined at time of compilation of source
+code and is immutable.  The consumer of an instance of data must know the type
+of the data in order to process it.  Intermediate code may transport
+references to data, without communicating the type of the data, by using the
+void pointer type.  Such a void pointer may be coupled with an runtime integral
+value which corresponds to the strict, static type.  The integral value may be
+used at runtime to determine the viability of interpretation of the data as a
+particular static type.  This was previously disclosed.
+
+Containers are a category of type which refer to a collection of instances of
+a particular element type.  Containers differ in implementation details such
+as whether elements are stored contiguously in memory, or as a linked list
+for example.  Containers have associated types which may be used to iterate
+over and process the elements in the array.  Such iterator types are strongly
+coupled to the element type in the container.  Thus, to iterate over and
+process the elements in a container, the type of the container must be
+statically (ie, at compile time) known and the type of the elements in the
+container must be statically known.  This is specified in the C++ standard.
+
+A runtime registration system is required to assign an integral value to
+each unique type which may be contained, and each container.  This may use
+``rtti`` (run-time type information) supplied by the compiler, or it may use
+external scaffolding.
+
+What is disclosed is a method of ``type erasure`` whereby the elements of
+a container may be iterated over, without static knowledge of the type of the
+container or the type of the elements of the container.
+
+1) A static ``Variant`` type is defined as an abstraction containing a void
+pointer to data and a run-time type identifier.  Such a type may be created with
+statically typed data only.  When such a type is created with
+data which is a container, a registry is populated to relate the run-time type
+identifier to a container abstraction implementation.
+
+2) The container abstraction implementation stores a type-erased, immutable
+void-pointer to the container, a type-erased, mutable void pointer representing
+an iterator, and various function pointers for the operations which need to be
+performed on an iterator to the container.  Such operations include increment,
+decrement, dereference, advance, distance, comparison and assignment.
+
+3) The static type used to create the ``Variant`` instance is also used to
+construct the container abstraction implementation.  The function pointers in
+the container abstraction implementation are generated with a factory
+template-dependent method.  The API of the pointed-to functions are type-erased.
+
+4) The implementation of the pointed-to functions operate on iterators and are
+implemented in terms of the C++ standard language and library features for
+iterators, such as increment, decrement dereference, advance, distance,
+comparison and assignment.
+
+5) There are generally two different forms of container iterators.  One is a
+pointer to contained data, which is suitable for containers which store
+elements contiguously in memory.  The other is a standalone type which supports
+the standard API required of an iterator type.  The two forms are handled
+differently.  In the first case, the type-erased mutable void pointer representing
+an iterator stored in the container abstraction implementation may point to the
+actual data in the container.  In the second case, the type-erased mutable void
+pointer representing an iterator stored in the container abstraction
+implementation may point to a heap-assigned copy of the standalone type which
+supports the standard API required of an iterator type.  The heap-assigned copy
+is deleted when no longer required.
+
+6) An abstraction is defined which encapsulates the operations on the container
+iterator objects.  The abstraction handles assignment (which may include heap
+construction), deletion (in the case of heap construction only), advancing the
+iterator, dereferencing and comparison.  The abstraction is implemented in
+terms of an iterator as a-pointer-to-contained data and as a standalone type.
+In all cases, the result of mutation is stored in the type-erased, mutable void
+pointer representing an iterator in the container abstraction implementation.
+
+7) The container abstraction is defined in terms of the container abstraction
+implementation.  The container abstraction contains standard methods to allow
+creation of type-erased iterator implementations pointing to the beginning and
+end of a container, as well as iterators pointing to particular seeked elements.
+This allows the use of standard library algorithms and language features as
+they apply to the containers.  The type-erased iterator is implemented in terms
+of the container abstraction implementation.
+
+8) Dereferencing a type-erased iterator yields an instance of a ``Variant``,
+which contains a type-erased void pointer to data in the container, and an
+integral value representing the type.  The integral value may be examined to
+interpret the void pointer as a static type which can be used with other code.
