@@ -45,15 +45,19 @@ What is disclosed is a method of ``type erasure`` whereby the elements of
 a container may be iterated over, without static knowledge of the type of the
 container or the type of the elements of the container.
 
+In the diagram, the strongly typed container is on the left side 'Container
+Type', and it has an associated 'Iterator Type'.
+
 1) A static ``Variant`` type is defined as an abstraction containing a void
 pointer to data and a run-time type identifier.  Such a type may be created with
 statically typed data only.  When such a type is created with
 data which is a container, a registry is populated to relate the run-time type
 identifier to a container abstraction implementation.
 
-2) The container abstraction implementation stores a type-erased, immutable
-void-pointer to the container, a type-erased, mutable void pointer representing
-an iterator, and various function pointers for the operations which need to be
+2) The container abstraction implementation ('Implementation' in the diagram)
+stores a type-erased, immutable void-pointer to the container, a type-erased,
+mutable void pointer representing an iterator, and various function pointers
+for the operations ('Typed Operation' in the diagram) which need to be
 performed on an iterator to the container.  Such operations include increment,
 decrement, dereference, advance, distance, comparison and assignment.
 
@@ -87,12 +91,13 @@ In all cases, the result of mutation is stored in the type-erased, mutable void
 pointer representing an iterator in the container abstraction implementation.
 
 7) The container abstraction is defined in terms of the container abstraction
-implementation.  The container abstraction contains standard methods to allow
-creation of type-erased iterator implementations pointing to the beginning and
-end of a container, as well as iterators pointing to particular seeked elements.
-This allows the use of standard library algorithms and language features as
-they apply to the containers.  The type-erased iterator is implemented in terms
-of the container abstraction implementation.
+implementation.  The container abstraction ('Type-erased Iterable' in the
+diagram) contains standard methods to allow creation of type-erased iterator
+implementations pointing to the beginning and end of a container, as well as
+iterators pointing to particular seeked elements.  This allows the use of
+standard library algorithms and language features as they apply to the
+containers.  The Type-erased Iterator is implemented in terms of the container
+abstraction implementation.
 
 8) Dereferencing a type-erased iterator yields an instance of a ``Variant``,
 which contains a type-erased void pointer to data in the container, and an
