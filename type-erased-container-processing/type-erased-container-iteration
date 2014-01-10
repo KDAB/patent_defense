@@ -24,7 +24,7 @@ references to data, without communicating the type of the data, by using the
 void pointer type.  Such a void pointer may be coupled with an runtime integral
 value which corresponds to the strict, static type.  The integral value may be
 used at runtime to determine the viability of interpretation of the data as a
-particular static type.  This was previously disclosed.
+particular static type.  This is already common practice.
 
 Containers are a category of type which refer to a collection of instances of
 a particular element type.  Containers differ in implementation details such
