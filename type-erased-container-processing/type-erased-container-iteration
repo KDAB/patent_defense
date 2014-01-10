@@ -1,8 +1,21 @@
-Disclosed is a method of processing the elements of a container in C++ code
-without compile-time knowledge of the type of the container or of the element
-type within the container.
+Disclosed is a method of processing the elements of a container in a strongly
+typed language without compile-time knowledge of the type of the container or
+of the element type within the container.
 
-The C++ type system provides readability, safety of data interpretation and
+This method is applicable to a language which:
+1) Is statically typed
+2) Has a way to represent data whose type is not known (eg a void pointer)
+3) Has a way to cast/interpret such non-typed data as a particular static
+type, where the type is defined at compile-time.
+4) Has a common way to represent operations on containers (eg iterators,
+algorithms) with "static polymorphism" - that is, the API is the same
+regardless of the precise type of the container or the type of the element in
+the container.
+5) Has no convenient built-in to provide container abstraction features.
+
+That includes C++, but may include other languages.
+
+A strong type system provides readability, safety of data interpretation and
 can be used for compatibility between different code from different vendors.
 The type of all code components is determined at time of compilation of source
 code and is immutable.  The consumer of an instance of data must know the type
@@ -21,7 +34,7 @@ over and process the elements in the array.  Such iterator types are strongly
 coupled to the element type in the container.  Thus, to iterate over and
 process the elements in a container, the type of the container must be
 statically (ie, at compile time) known and the type of the elements in the
-container must be statically known.  This is specified in the C++ standard.
+container must be statically known.
 
 A runtime registration system is required to assign an integral value to
 each unique type which may be contained, and each container.  This may use
@@ -50,9 +63,8 @@ the container abstraction implementation are generated with a factory
 template-dependent method.  The API of the pointed-to functions are type-erased.
 
 4) The implementation of the pointed-to functions operate on iterators and are
-implemented in terms of the C++ standard language and library features for
-iterators, such as increment, decrement dereference, advance, distance,
-comparison and assignment.
+implemented according to standards and library features for iterators, such as
+increment, decrement dereference, advance, distance, comparison and assignment.
 
 5) There are generally two different forms of container iterators.  One is a
 pointer to contained data, which is suitable for containers which store
