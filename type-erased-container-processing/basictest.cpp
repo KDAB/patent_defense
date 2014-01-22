@@ -2,7 +2,7 @@
   This file is part of an example implementation of type-erased container
   iteration
 
-  Copyright (C) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+  Copyright (C) 2013,2014 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
   Author: Stephen Kelly <stephen.kelly@kdab.com>
 
   This program is free software; you can redistribute it and/or modify
@@ -59,6 +59,7 @@ int main(int argc, char **argv)
 
     TypeErasure::SequentialIterable iter = var.as<TypeErasure::SequentialIterable>();
 
+    // Demonstrate stl-style iteration.
     auto it = std::begin(iter);
     const auto endIt = std::end(iter);
 
@@ -79,6 +80,7 @@ int main(int argc, char **argv)
 
     TypeErasure::SequentialIterable iter = var.as<TypeErasure::SequentialIterable>();
 
+    // Demonstrate c++11-style range-for iteration.
     for (TypeErasure::Variant v : iter)
         {
         print(v);
@@ -97,8 +99,12 @@ int main(int argc, char **argv)
     TypeErasure::SequentialIterable iter = var.as<TypeErasure::SequentialIterable>();
 
     std::cout << "List size: " << iter.size();
+
+    // Demonstrate the runtime determination of whether it is possible to
+    // iterate backwards over a container.
     std::cout << " (Can " << (iter.canReverseIterate() ? "" : "not ") << "reverse iterate)" << std::endl;
 
+    // Demonstrate c++11-style range-for iteration.
     for (auto v : iter)
         {
         print(v);

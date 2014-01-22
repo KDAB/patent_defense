@@ -2,7 +2,7 @@
   This file is part of an example implementation of type-erased container
   iteration
 
-  Copyright (C) 2013 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+  Copyright (C) 2013,2014 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
   Author: Stephen Kelly <stephen.kelly@kdab.com>
 
   This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,18 @@
 namespace TypeErasure
 {
 
+/**
+  @brief Structure of void pointer and runtime type id.
+
+  This is the data-implementation of the ``Variant``, but must be separate
+  because the ``Variant`` has API which depends on the
+  SequentialIterableImplementation and must be declared after it.  This
+  ``VariantData`` can be declared early and used in the
+  SequentialIterableImplementation code.
+
+  As it is the data implementation of the ``Variant`` type, this relates to
+  [Disclosure 1].
+ */
 struct VariantData
 {
     VariantData(const std::size_t metaTypeId_,
@@ -40,6 +52,23 @@ struct VariantData
     const void *data;
 };
 
+/**
+  @brief Iterator operation abstraction
+
+  An implementation of IteratorAPI for containers whose const_iterator is a
+  standalone class, not simply a pointer to a contained element.
+
+  It is therefore necessary to copy-construct const_iterator types on the heap
+  and manage the memory by deleting appropriately.
+
+  Accessing the actual data in getData() may require de-referencing the pointer to
+  the iterator, then de-referencing the actual iterator and retrieving the
+  address of the relevant data.
+
+  This is the implementation of [Disclosure 6] and relates to [Disclosure 5].
+  These methods implement [Disclosure 4] through the use of algorithms such as
+  ``std::advance`` and other operations on iterators.
+ */
 template<typename const_iterator>
 struct IteratorAPI
 {
@@ -78,6 +107,24 @@ struct IteratorAPI
         return *static_cast<const_iterator*>(*it) == *static_cast<const_iterator*>(*other);
     }
 };
+/**
+  @brief Iterator operation abstraction
+
+  An implementation of IteratorAPI for containers whose const_iterator is
+  simply a pointer to a contained element, not a standalone class.
+
+  It is not necessary (or necessarily possible) to copy-construct such elements
+  on the heap as in the alternative implementation above.  Assignment is
+  therefore more simple, and 'deletion' is a no-op.
+
+  Accessing the actual data in getData() may require only de-referencing the
+  pointer to the iterator. The iterator is already the address of the relevant
+  data.
+
+  This is the implementation of [Disclosure 6] and relates to [Disclosure 5].
+  These methods implement [Disclosure 4] through the use of algorithms such as
+  ``std::advance`` and other operations on iterators.
+ */
 template<typename value_type>
 struct IteratorAPI<const value_type*>
 {
@@ -117,6 +164,13 @@ struct IteratorAPI<const value_type*>
     }
 };
 
+/**
+  Capabilities which map to some standard concepts for recording and use at
+  runtime.  This allows runtime determination of whether it is possible to
+  perform backwards or random iteration with the container.
+
+  As it relates to API for use by downstreams, this relates to [Disclosure 7]
+ */
 enum IteratorCapability
 {
     ForwardCapability = 1,
@@ -140,9 +194,32 @@ struct CapabilitiesImpl<T, std::random_access_iterator_tag>
 template<typename T>
 struct ContainerAPI : CapabilitiesImpl<T>
 {
+    /**
+      This method implements [Disclosure 4] through the use of the
+      ``std::distance`` algorithm.  The ContainerAPI template may be
+      specialized for particular containers which may implement a more-efficient
+      way to determine the size.
+    */
     static int size(const T *t) { return std::distance(t->begin(), t->end()); }
 };
 
+/**
+  @brief Structure of reference to a container data and operations to perform on it.
+
+  Store a type-erased immutable reference to the container, the runtime-id of the type of
+  the elements in the container, the capabilities so that usable API may be
+  determined at runtime, function pointers for relevant operations, and a
+  mutable location to store a type-erased iterator while it is in use.
+
+  The function pointers for iterator operations have type-erased API - they
+  have parameters and return types which are void pointers or basic types.
+  Although the API of the functions are type-erased, particular typed
+  implementations of these operations are generated in the contructor of
+  SequentialIterableImplementation ([Disclosure 3]).
+
+  This class implements [Disclosure 2].
+  The methods in this class implement [Disclosure 4].
+ */
 class SequentialIterableImplementation
 {
 public:
@@ -210,6 +287,18 @@ public:
     { IteratorAPI<typename T::const_iterator>::assign(dest, src); }
 
 public:
+    /**
+      @brief Constructor taking a pointer to a strongly-typed container.
+
+      Although the reference to the strongly-typed container is stored as a
+      type-erased void pointer, the strong type is necessary here in order
+      to create typed function pointers (with type-erased API) for each
+      relevant operation.
+
+      This method implements [Disclosure 3].
+      The actual implementations of the created functions relate to
+      [Disclosure 5].
+     */
     template<class T> SequentialIterableImplementation(const T*p)
       : _iterable(p)
       , _iterator(0)
@@ -227,6 +316,11 @@ public:
     {
     }
 
+    /**
+      @brief Default constructor
+
+      Initialize all data to null.
+     */
     SequentialIterableImplementation()
       : _iterable(0)
       , _iterator(0)
@@ -271,8 +365,17 @@ public:
     }
 };
 
+/**
+  This container is populated with mappings from runtime type identifier to
+  implementation of type-erased operations [Disclosure 1].
+ */
 std::map<std::size_t, SequentialIterableImplementation> converterRegistry;
 
+/**
+  @brief User-facing API for using the type-erased container implementation.
+
+  This class implements [Disclosure 7].
+ */
 class SequentialIterable
 {
     SequentialIterableImplementation m_impl;
@@ -301,10 +404,22 @@ bool SequentialIterable::canReverseIterate() const
     return m_impl._iteratorCapabilities & BiDirectionalCapability;
 }
 
+
+/**
+  @brief User-facing API for handling type-erased data which may be a container.
+
+  This class implements [Disclosure 1].
+ */
 struct Variant
 {
   VariantData data;
 
+  /**
+    @brief Contructor accepting a strongly-typed container.
+
+    Populate the converterRegistry ([Disclosure 1]). Forward the strong type
+    to SequentialIterableImplementation to implement [Disclosure 3].
+   */
   template<typename T>
   Variant(const T& t)
     : data(typeid(T).hash_code(), &t)
@@ -338,6 +453,13 @@ SequentialIterable Variant::as<SequentialIterable>() const
     return SequentialIterable{ impl };
 }
 
+/**
+  @brief User-facing API for using the type-erased container implementation.
+
+  The implementation of these methods forward to the SequentialIterableImplementation.
+
+  This class implements [Disclosure 7]
+ */
 struct SequentialIterable::const_iterator
 {
 private:
@@ -436,6 +558,9 @@ SequentialIterable::const_iterator::operator=(const const_iterator &other)
     return *this;
 }
 
+/**
+  Dereference operator implements [Disclosure 8]
+ */
 const Variant SequentialIterable::const_iterator::operator*() const
 {
     const VariantData d = m_impl.getCurrent();
