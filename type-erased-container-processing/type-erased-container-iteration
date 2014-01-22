@@ -1,19 +1,21 @@
+
+Type-Erased Container Iteration
+*******************************
+
+Abstract
+========
+
 Disclosed is a method of processing the elements of a container in a strongly
 typed language without compile-time knowledge of the type of the container or
 of the element type within the container.
 
-This method is applicable to a language which:
-1) Is statically typed
-2) Has a way to represent data whose type is not known (eg a void pointer)
-3) Has a way to cast/interpret such non-typed data as a particular static
-type, where the type is defined at compile-time.
-4) Has a common way to represent operations on containers (eg iterators,
-algorithms) with "static polymorphism" - that is, the API is the same
-regardless of the precise type of the container or the type of the element in
-the container.
-5) Has no convenient built-in to provide container abstraction features.
+.. admonition:: Keywords
 
-That includes C++, but may include other languages.
+   Type-erasure, container, iteration, rtti, runtime type information,
+   dynamic type, dynamic typing, variable type, any type
+
+Introduction
+============
 
 A strong type system provides readability, safety of data interpretation and
 can be used for compatibility between different code from different vendors.
@@ -36,6 +38,9 @@ process the elements in a container, the type of the container must be
 statically (ie, at compile time) known and the type of the elements in the
 container must be statically known.
 
+Description
+===========
+
 A runtime registration system is required to assign an integral value to
 each unique type which may be contained, and each container.  This may use
 ``rtti`` (run-time type information) supplied by the compiler, or it may use
@@ -44,6 +49,19 @@ external scaffolding.
 What is disclosed is a method of ``type erasure`` whereby the elements of
 a container may be iterated over, without static knowledge of the type of the
 container or the type of the elements of the container.
+
+This method is applicable to a language which:
+1) Is statically typed
+2) Has a way to represent data whose type is not known (eg a void pointer)
+3) Has a way to cast/interpret such non-typed data as a particular static
+type, where the type is defined at compile-time.
+4) Has a common way to represent operations on containers (eg iterators,
+algorithms) with "static polymorphism" - that is, the API is the same
+regardless of the precise type of the container or the type of the element in
+the container.
+5) Has no convenient built-in to provide container abstraction features.
+
+That includes C++, but may include other languages.
 
 In the diagram, the strongly typed container is on the left side 'Container
 Type', and it has an associated 'Iterator Type'.
