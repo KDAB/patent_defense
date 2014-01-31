@@ -76,8 +76,9 @@ identifier to a container abstraction implementation.
 stores a type-erased, immutable void-pointer to the container, a type-erased,
 mutable void pointer representing an iterator, and various function pointers
 for the operations ('Typed Operation' in the diagram) which need to be
-performed on an iterator to the container.  Such operations include increment,
-decrement, dereference, advance, distance, comparison and assignment.
+performed on an iterator to the container.  Such operations include but are
+not limited to increment, decrement, dereference, advance, distance,
+comparison and assignment.
 
 3) The static type used to create the ``Variant`` instance is also used to
 construct the container abstraction implementation.  The function pointers in
@@ -85,8 +86,9 @@ the container abstraction implementation are generated with a factory
 template-dependent method.  The API of the pointed-to functions are type-erased.
 
 4) The implementation of the pointed-to functions operate on iterators and are
-implemented according to standards and library features for iterators, such as
-increment, decrement dereference, advance, distance, comparison and assignment.
+implemented according to standards and library features for iterators,
+including but not limited to increment, decrement dereference, advance,
+distance, comparison and assignment.
 
 5) There are generally two different forms of container iterators.  One is a
 pointer to contained data, which is suitable for containers which store
@@ -101,12 +103,13 @@ supports the standard API required of an iterator type.  The heap-assigned copy
 is deleted when no longer required.
 
 6) An abstraction is defined which encapsulates the operations on the container
-iterator objects.  The abstraction handles assignment (which may include heap
-construction), deletion (in the case of heap construction only), advancing the
-iterator, dereferencing and comparison.  The abstraction is implemented in
-terms of an iterator as a-pointer-to-contained data and as a standalone type.
-In all cases, the result of mutation is stored in the type-erased, mutable void
-pointer representing an iterator in the container abstraction implementation.
+iterator objects.  The abstraction must handle at least assignment (which may
+include heap construction), deletion (in the case of heap construction only),
+advancing the iterator, dereferencing and comparison. The abstraction is
+implemented in terms of an iterator as a-pointer-to-contained data and as a
+standalone type. In all cases, the result of mutation is stored in the
+type-erased, mutable void pointer representing an iterator in the container
+abstraction implementation.
 
 7) The container abstraction is defined in terms of the container abstraction
 implementation.  The container abstraction ('Type-erased Iterable' in the
