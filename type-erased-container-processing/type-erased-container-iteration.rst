@@ -2,6 +2,18 @@
 Type-Erased Container Iteration
 *******************************
 
+.. sidebar:: Status
+
+    Published
+      23-Jan-2014
+    Author
+      Stephen Kelly <stephen.kelly@kdab.com>
+    Disclosure-Number
+      IPCOM000234630D
+    Links
+      * `IP.com <http://ip.com/IPCOM/000234630>`_
+      * `defensivepublications.org <http://www.defensivepublications.org/publications/type-erased-container-iteration>`_
+
 Abstract
 ========
 
