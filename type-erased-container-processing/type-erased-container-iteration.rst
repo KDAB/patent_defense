@@ -10,6 +10,8 @@ Type-Erased Container Iteration
       Stephen Kelly <stephen.kelly@kdab.com>
     Disclosure-Number
       IPCOM000234630D
+    Implementations
+      `QVariant <https://qt.gitorious.org/qt/qtbase/source/v5.2.0:src/corelib/kernel/qvariant.h>`_/`QMetaType <https://qt.gitorious.org/qt/qtbase/source/v5.2.0:src/corelib/kernel/qmetatype.h>`_
     Links
       * `IP.com <http://ip.com/IPCOM/000234630>`_
       * `defensivepublications.org <http://www.defensivepublications.org/publications/type-erased-container-iteration>`_
