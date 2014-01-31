@@ -63,6 +63,11 @@ the container.
 
 That includes C++, but may include other languages.
 
+.. figure:: drawing.svg
+   :alt: Diagram of iteraction of components for container processing
+
+   Diagram of Iteraction of Components for Container Processing
+
 In the diagram, the strongly typed container is on the left side 'Container
 Type', and it has an associated 'Iterator Type'.
 
@@ -124,3 +129,15 @@ abstraction implementation.
 which contains a type-erased void pointer to data in the container, and an
 integral value representing the type.  The integral value may be examined to
 interpret the void pointer as a static type which can be used with other code.
+
+Listing 1
+=========
+
+.. literalinclude:: basictest.cpp
+   :language: c++
+
+Listing 2
+=========
+
+.. literalinclude:: types.h
+   :language: c++
