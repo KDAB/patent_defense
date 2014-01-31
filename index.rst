@@ -17,5 +17,5 @@ Defensive Patent Publications for Qt:
 Other
 =====
 
- * `Qt Assistance Documentation <PatentDefense.qch>`_
+ * `Qt Assistant Documentation <PatentDefense.qch>`_
  * :ref:`search`
